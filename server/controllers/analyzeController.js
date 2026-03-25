@@ -1,3 +1,5 @@
+import { analyzeService } from "../services/analyzeService.js";
+
 export const analyze = async (req, res) => {
   try {
     const { jobDescription, skills } = req.body;
