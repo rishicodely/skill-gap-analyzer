@@ -58,7 +58,7 @@ function App() {
               <h2 className="text-2xl">
                 Match Score:{" "}
                 <span className="font-bold text-green-400">
-                  {result.match_score}%
+                  {result.match_score}
                 </span>
               </h2>
 

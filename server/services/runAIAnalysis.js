@@ -1,36 +1,30 @@
 import dotenv from "dotenv";
 dotenv.config({ path: "../.env" });
 
-import OpenAI from "openai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const client = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+
+const model = genAI.getGenerativeModel({
+  model: "gemini-2.5-flash",
+  generationConfig: { responseMimeType: "application/json" },
 });
 
 export const runAIAnalysis = async (prompt) => {
-  // const response = await client.chat.completions.create({
-  //   model: "gpt-4o-mini",
-  //   messages: [
-  //     {
-  //       role: "user",
-  //       content: prompt,
-  //     },
-  //   ],
-  // });
-
-  // const raw = response.choices[0].message.content;
-
   try {
-    // return JSON.parse(raw);
-    return {
-      required_skills: ["React", "Node.js", "MongoDB"],
-      candidate_skills: ["React", "JavaScript"],
-      missing_skills: ["Node.js", "MongoDB"],
-      match_score: "40",
-      learning_plan: ["Learn Node.js basics", "Practice MongoDB"],
-    };
+    const result = await model.generateContent(`
+      Return a JSON object analyzing these skills. 
+      Format: { "required_skills": [], "candidate_skills": [], "missing_skills": [], "match_score": "", "learning_plan": [] }
+      
+      User Prompt: ${prompt}
+    `);
+
+    const response = await result.response;
+    const text = response.text();
+
+    return JSON.parse(text);
   } catch (err) {
-    console.log("RAW AI RESPONSE:\n", raw);
-    throw new Error("Invalid JSON from AI");
+    console.error("AI ANALYSIS ERROR:", err);
+    throw new Error("Failed to analyze skills");
   }
 };
